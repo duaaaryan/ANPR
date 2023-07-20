@@ -2,6 +2,7 @@
   "name": "fullstack_anpr",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://127.0.0.1:3000/",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,12 +10,20 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.0",
+    "axios": "^1.4.0",
     "next": "13.4.9",
+    "node-fetch": "^2.6.12",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.14",
     "eslint": "8.44.0",
-    "eslint-config-next": "13.4.9"
+    "eslint-config-next": "13.4.9",
+    "postcss": "^8.4.25",
+    "tailwindcss": "^3.3.2"
   }
 }

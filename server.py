@@ -128,16 +128,6 @@ def handle_data():
 def main(filename):
     results = {}
 
-    sr = dnn_superres.DnnSuperResImpl_create()
-                
-
-        # Reading the model
-    path = "/Users/aaryandua/Downloads/Aaryan_Work /models/FSRCNN_x3.pb"
-    sr.readModel(path)
-
-        # Set the desired model and scale to get correct pre- and post-processing
-    sr.setModel("fsrcnn", 3)
-
 
     mot_tracker = Sort()
 
@@ -192,35 +182,56 @@ def main(filename):
 
                     # process license plate
                     license_plate_crop_gray = cv2.cvtColor(license_plate_crop, cv2.COLOR_BGR2GRAY)
-                    license_plate_crop_gray = sr.upsample(license_plate_crop_gray)
-                    license_plate_crop_gray = sr.upsample(license_plate_crop_gray)
                     _, license_plate_crop_thresh = cv2.threshold(license_plate_crop_gray, 90, 255, cv2.THRESH_BINARY_INV)
                     cv2.imwrite('public/license_plate.png', license_plate_crop_gray)
                     cv2.imwrite('public/license_plate_thresh.png', license_plate_crop_thresh)
                     time.sleep(4)
                     license_plate_text, license_plate_text_score = read_license_plate(license_plate_crop_thresh)
 
-                    if license_plate_text :
+                    if license_plate_text:
+                        confidence_threshold = 0.5  # Set the confidence threshold (e.g., 0.6 for 60%)
+
+                        # Determine if the confidence is above the threshold
+                        #API KEY AND VERIFICATION HAS BEEN REMOVED BY GITHUB DUE TO SECURITY REASONS
+                        is_vahan_verified = license_plate_text_score >= confidence_threshold 
+
+                        # Add "Vahan Verified" field to the results
+                        results[frame_nmr][car_id] = {
+                            'car': {'bbox': [xcar1, ycar1, xcar2, ycar2]},
+                            'license_plate': {
+                                'bbox': [x1, y1, x2, y2],
+                                'text': license_plate_text,
+                                'bbox_score': score,
+                                'text_score': license_plate_text_score,
+                                'Vahan_Verified': 'TRUE' if is_vahan_verified else 'FALSE'
+                            }
+                        }
+
+
                         cv2.putText(frame, license_plate_text, (int(x1), int(y1)), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
                         cv2.imwrite('public/image.png', frame)
-                        results[frame_nmr][car_id] = {'car': {'bbox': [xcar1, ycar1, xcar2, ycar2]},
-                                                    'license_plate': {'bbox': [x1, y1, x2, y2],
-                                                                        'text': license_plate_text,
-                                                                        'bbox_score': score,
-                                                                        'text_score': license_plate_text_score}}
-                
-                        write_csv(results, 'public/test.csv')
+
+                    # Write the updated results to a CSV file
+                    write_csv(results, 'public/test.csv')
+
 
     with open('public/test.csv', 'r') as file:
         reader = csv.DictReader(file)
         data = list(reader)
 
-            # Interpolate missing data
-    interpolated_data = interpolate_bounding_boxes(data)
-                # cv2.imshow('frame', frame)
-                # cv2.waitKey(0)
-                # Write updated data to a new CSV file
-    header=['frame', 'car_id', 'car_bbox_x1', 'car_bbox_y1', 'car_bbox_x2', 'car_bbox_y2', 'license_plate_bbox_x1', 'license_plate_bbox_y1', 'license_plate_bbox_x2', 'license_plate_bbox_y2', 'license_plate_text', 'car_bbox_score', 'license_plate_bbox_score', 'license_plate_text_score']
+        # Interpolate missing data
+        interpolated_data = interpolate_bounding_boxes(data)
+
+    # Add a "Vahan Verified" field
+    for entry in interpolated_data:
+        confidence = float(entry['license_number_score'])
+        if confidence > 70:
+            entry['Vahan Verified'] = 'TRUE'
+        else:
+            entry['Vahan Verified'] = 'FALSE'
+
+    header = ['frame_nmr', 'car_id', 'car_bbox', 'license_plate_bbox', 'license_plate_bbox_score', 'license_number', 'license_number_score', 'Vahan_Verified']
+
     with open('public/test_interpolated.csv', 'w', newline='') as file:
         writer = csv.DictWriter(file, fieldnames=header)
         writer.writeheader()

@@ -142,14 +142,21 @@ const VideoUpload = () => {
 
   return (
     <div clas>
-    <header className={`p-4 flex items-left fixed w-full top-0 transition-all ${isScrolled ? 'bg-zinc-800/40 backdrop-blur-lg text-white border-gray-700 shadow-xl' : 'bg-blue-700'}`}>
-      <h1 className="font-bold text-2xl">ANPR Demo</h1>
-      <ul className="flex italic items-center m-auto">
-        <li className="mr-16">Avg. 2198 ms per frame</li>
-        <li className="mr-16">Car, Bike, Truck, Bus, and Person detection</li>
-        <li className="mr-8">62% Accuracy</li>
-      </ul>
-    </header>
+<header className={`p-3 flex items-center justify-between fixed w-full top-0 transition-all ${isScrolled ? 'bg-zinc-800/40 backdrop-blur-lg text-white border-gray-700 shadow-xl' : 'bg-blue-700'}`}>
+  <div className='w-full my-auto flex items-center transition-all'>
+    <h1 className="font-bold text-2xl">ANPR</h1>
+    <ul className="flex italic items-center space-x-6 ml-auto mr-auto">
+      <li>Avg. 2198 ms per frame</li>
+      <li>Car, Bike, Truck, Bus, and Person detection</li>
+      <li>62% Accuracy</li>
+    </ul>
+  </div>
+  <div className='text-right'>
+    <img src='../images-2.png' className='w-[48px] h-auto rounded'/>
+  </div>
+</header>
+
+
       {imageUrl && uploadClicked ? (
         <div className="m-auto text-center p-16 pt-32">
           {imageUrl && videoFile ? (
